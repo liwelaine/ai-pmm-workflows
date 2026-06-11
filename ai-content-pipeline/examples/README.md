@@ -8,6 +8,8 @@ nothing else in the code changes.
   (procurement leader / finance leader / business requester).
 - **`shopify.json`** — SMB commerce platform. Segments by *business stage*
   (first-time founder / growing brand / established retailer).
+- **`datadog.json`** — AI observability & security platform. Segments by *accountability in production*
+  (platform leader / SRE / security / finance).
 - **`_template.json`** — the schema, with each field annotated. Fill this in for a new company.
 
 Run any profile:
