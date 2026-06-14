@@ -9,7 +9,7 @@ This repository is designed as a product marketing portfolio project, not just a
 ## Workflow at a Glance
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Company Profile] --> B[Audience Personas]
     B --> C[Persona-Based Content]
     C --> D[CRM-Style Distribution]
@@ -24,16 +24,7 @@ flowchart LR
 
 AI Content Pipeline is a runnable workflow that takes a company profile as input and turns it into segmented marketing content and performance recommendations.
 
-The workflow moves from:
-
-```text
-company profile
-→ audience personas
-→ blog and newsletter content
-→ CRM-style distribution
-→ engagement analytics
-→ optimization recommendations
-```
+The workflow moves from company profile to personas, content, CRM-style distribution, analytics, and optimization recommendations.
 
 ---
 
@@ -126,4 +117,3 @@ ai-content-pipeline/SKILL.md
 - Sales enablement brief builder
 - Customer interview synthesis workflow
 - Launch messaging and GTM planning assistant
-  
