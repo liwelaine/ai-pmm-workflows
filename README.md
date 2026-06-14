@@ -17,7 +17,9 @@ flowchart TD
     E --> F[Optimization Recommendations]
     F --> C
 ```
+## Preview
 
+![AI Content Pipeline Preview](assets/preview-flow.png)
 ---
 
 ## Featured Workflow: AI Content Pipeline
