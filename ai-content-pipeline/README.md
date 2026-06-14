@@ -1,235 +1,251 @@
 # AI Content Pipeline
 
-> **Two ways to use this.** As a **Claude skill** — see [`SKILL.md`](./SKILL.md): give Claude a
-> company or an ICP, confirm the personas it proposes, and it generates the content + report.
-> As a **runnable program** — `python main.py run --company zip` (below), no API keys needed.
-> Both share the same `pipeline/` code.
+AI Content Pipeline is a runnable AI-native product marketing workflow.
 
-A lightweight, mostly hands-free pipeline that **generates** marketing content with an
-LLM, **distributes** it to segmented audiences through a CRM (HubSpot), and **measures
-and optimizes** it based on engagement — closing the loop from a blog idea to a
-performance-driven recommendation for the next one.
+It takes a company profile as input, generates audience personas, creates persona-based content, simulates CRM-style campaign distribution, tracks engagement, and recommends the next content opportunities.
 
-> Built for the *Content & Growth Analyst* take-home, then generalized into a
-> **company-profile-driven** engine and demonstrated on two real, very different companies:
-> **Zip** (enterprise procurement) and **Shopify** (SMB commerce).
-
-**The whole thing runs with zero API keys** (every external dependency mocks cleanly),
-so a reviewer can clone and run it in one command. Add keys in `.env` to flip individual
-subsystems to live.
+This project is designed as a PMM workflow prototype, not a full production marketing platform. It demonstrates how AI can help structure repeatable GTM work: segmentation, messaging, content creation, campaign execution, measurement, and optimization.
 
 ---
 
-## What it does
-
-```
-                 ┌──────────────┐
-   topic ───────▶│  1. GENERATE │  Claude → 1 blog (400–600w) + 3 persona newsletters
-                 └──────┬───────┘  stored as JSON + Markdown
-                        │
-                        ▼
-                 ┌──────────────┐
-                 │ 2. DISTRIBUTE│  HubSpot → upsert + tag contacts, segment lists,
-                 └──────┬───────┘  send per-persona variant, log campaign
-                        │
-                        ▼
-                 ┌──────────────┐
-                 │ 3. MEASURE   │  simulate opens/clicks/unsubs → SQLite (history)
-                 └──────┬───────┘  → AI performance summary + recommendations
-                        │
-                        ▼
-                 ┌──────────────┐
-                 │ 4. OPTIMIZE  │  read engagement trends → next topics + headline A/Bs
-                 └──────────────┘  (feeds back into stage 1)
-```
-
-### Architecture & flow
+## Workflow Overview
 
 ```mermaid
 flowchart TD
-    A[Topic input] --> B[content_generation.py]
-    B -->|blog + 3 newsletters| C[(content.json / .md)]
-    B --> D[distribution.py]
-    D --> E[crm.py · HubSpot client]
-    E -->|upsert contacts<br/>segment lists<br/>send + log| F{{HubSpot API<br/>live or mock}}
-    D --> G[analytics.py]
-    G -->|simulate engagement| H[(SQLite · pipeline.db)]
-    G --> I[llm.py]
-    I -->|performance summary| J[AI readout + recs]
-    H --> K[optimization.py]
-    K --> I
-    I -->|next topics / headlines| L[Optimization slate]
-    L -.feeds next run.-> A
-
-    B -.->|no key → template| I
-    E -.->|no token → mock| F
-
-    subgraph UI
-      M[main.py · CLI]
-      N[dashboard/app.py · Flask]
-    end
-    M --> B
-    N --> B
+    A[Company Profile] --> B[Persona Generation]
+    B --> C[Content Generation]
+    C --> D[CRM-Style Distribution]
+    D --> E[Engagement Analytics]
+    E --> F[Optimization Recommendations]
+    F --> C
 ```
-
-The CLI (`main.py`) and the Flask dashboard (`dashboard/app.py`) are both thin
-orchestrators over the same `pipeline/` modules — no logic is duplicated.
 
 ---
 
-## Repo structure
+## What the Workflow Does
 
+1. Reads a company profile from JSON
+2. Generates audience personas
+3. Creates blog and newsletter content
+4. Simulates CRM-style distribution
+5. Tracks campaign engagement
+6. Stores performance history
+7. Recommends next topics, angles, and headline tests
+
+---
+
+## Two Ways to Use This
+
+### 1. As a runnable program
+
+Run the workflow locally with a sample company profile:
+
+```bash
+python main.py run --profile examples/zip.json
 ```
-novamind-content-pipeline/
-├── main.py                  # CLI: run / history / optimize
-├── config.py                # env loading, live-vs-mock detection
+
+You can also run other company profiles:
+
+```bash
+python main.py run --profile examples/shopify.json
+python main.py run --profile examples/datadog.json
+```
+
+### 2. As a Claude Skill
+
+The same workflow logic can also be used as a Claude Skill. See:
+
+```text
+SKILL.md
+```
+
+The skill version lets Claude take a company or ICP, propose personas, and generate content and recommendations.
+
+---
+
+## Repository Structure
+
+```text
+ai-content-pipeline/
+├── README.md
+├── SKILL.md
+├── main.py
+├── config.py
 ├── requirements.txt
-├── .env.example             # all config documented here
-├── smoke_test.py            # dashboard test (Flask test client)
+├── .env.example
+├── smoke_test.py
+├── examples/
 ├── pipeline/
-│   ├── llm.py               # Claude wrapper + deterministic mock fallback
-│   ├── personas.py          # the 3 audience segments + engagement priors
-│   ├── content_generation.py# stage 1: blog + per-persona newsletters
-│   ├── crm.py               # stage 2: HubSpot client (real endpoints, live/mock)
-│   ├── distribution.py      # stage 2: segment + send orchestration
-│   ├── analytics.py         # stage 3: simulate, persist, AI-summarize
-│   ├── optimization.py      # stage 4: next-content recommendations
-│   └── storage.py           # SQLite schema + historical queries
 ├── data/
-│   ├── contacts.json        # mock contact book (segmented by persona)
-│   ├── pipeline.db          # generated · campaign + metric history (gitignored)
-│   └── runs/                # generated · per-run content + report (gitignored)
 └── dashboard/
-    ├── app.py               # Flask app
-    └── templates/index.html # control-room dashboard UI
 ```
 
 ---
 
-## Company profiles & personas (the segmentation decision)
+## Core Modules
 
-The pipeline is **company-profile driven**: the same engine runs for any company by
-swapping one profile (context + seed content + audience personas) in
-`pipeline/personas.py`. Two profiles ship as examples, and they deliberately segment
-*differently* — which is the whole point:
-
-| Company | What it sells | Segments by | The three audiences |
-|---|---|---|---|
-| **Zip** | Enterprise procurement software | **organizational role** (an enterprise has many distinct stakeholders) | Procurement Leader · Finance Leader · Business Requester |
-| **Shopify** | Commerce platform for SMB owners | **business stage** (one owner wears every hat, so maturity matters more than title) | First-time Founder · Growing DTC Brand · Established Retailer |
-
-The segmentation *logic* adapts to the market, not just the persona names. Each persona
-carries its content angle and a newsletter template, plus engagement priors used by the
-simulation layer. Adding a company or changing the segmentation is a one-file edit.
-
----
-
-## Tools, APIs & models
-
-| Concern | Choice | Notes |
-|---|---|---|
-| Content + summaries | **Anthropic Claude** (`claude-sonnet-4`) | via the official `anthropic` SDK; swappable behind `pipeline/llm.py` |
-| CRM / distribution | **HubSpot** v3 CRM + Marketing APIs | real endpoints & payloads built for every call (see below) |
-| Storage / history | **SQLite** (stdlib) | accumulates campaigns + metrics across runs for comparison |
-| Content storage | **JSON + Markdown** | `data/runs/<campaign>/content.{json,md}` |
-| Dashboard | **Flask** + Jinja2 | single-page control room; reuses the pipeline modules |
-| CLI tables | **tabulate** | terminal performance report |
-
-### HubSpot endpoints exercised (`pipeline/crm.py`)
-
-| Action | Method & endpoint |
-|---|---|
-| Upsert + tag contact | `POST /crm/v3/objects/contacts` (custom `persona` property) |
-| Define persona segment | `POST /crm/v3/lists` (dynamic list filtered on `persona`) |
-| Send newsletter variant | `POST /marketing/v3/transactional/single-email/send` |
-| Log campaign | `POST /crm/v3/objects/marketing_campaigns` |
-
-In mock mode the client **builds the exact request (endpoint + JSON payload) and records
-it** to `data/runs/<campaign>/crm_requests.json` instead of sending, so you can inspect
-realistic payloads without an account.
+```text
+pipeline/
+├── llm.py                  # LLM wrapper and mock/live mode
+├── personas.py             # Audience persona generation
+├── content_generation.py   # Blog and newsletter generation
+├── crm.py                  # CRM-style contacts and segments
+├── distribution.py         # Campaign distribution simulation
+├── analytics.py            # Engagement metrics
+├── optimization.py         # Next-step recommendations
+├── report.py               # Output summaries
+└── storage.py              # Local storage and history
+```
 
 ---
 
-## Assumptions & what's mocked
+## Company Profiles and Segmentation
 
-- **No keys required.** With `ANTHROPIC_API_KEY` unset, `llm.py` uses a deterministic
-  template engine that still produces topic-aware blog + newsletter copy, an AI-style
-  performance summary, and optimization suggestions — so the full loop is demonstrable
-  offline. The prompts sent to the real model are the same ones the mock routes on.
-- **HubSpot runs in mock mode by default** (`HUBSPOT_MODE=mock`). Requests are built and
-  logged, not sent. Set `HUBSPOT_MODE=live` + a token to actually call the API.
-- **Engagement is simulated, not real.** Each persona has a baseline open/click/unsub
-  rate (a realistic prior) plus run-to-run noise (`SIM_SEED` for reproducibility).
-- **Sample vs. segment.** The CRM stage sends to a small *sample* of real contacts in
-  `contacts.json` to demonstrate the API mechanics, while engagement is simulated over a
-  larger notional *segment audience* (set per persona) so reported rates are smooth and
-  comparable — the way a real ESP reports them. Both numbers are shown.
-- **Segmentation** is modeled via a custom `persona` contact property + a dynamic list,
-  rather than HubSpot's UI-built lists.
+The workflow is company-profile driven. The same engine can run for different companies by swapping the input profile.
+
+Example company profiles include:
+
+| Company | Market                 | Segmentation logic              | Example audiences                                           |
+| ------- | ---------------------- | ------------------------------- | ----------------------------------------------------------- |
+| Zip     | Enterprise procurement | Organizational role             | Procurement Leader, Finance Leader, Business Requester      |
+| Shopify | SMB commerce           | Business stage                  | First-time Founder, Growing DTC Brand, Established Retailer |
+| Datadog | Cloud observability    | Technical and business function | Engineering Leader, DevOps Team, Platform Buyer             |
+
+The segmentation logic adapts to the market instead of only changing persona names.
 
 ---
 
-## Run it locally
+## Run Locally
 
 Requires Python 3.10+.
 
 ```bash
-# 1. install
-python -m venv .venv && source .venv/bin/activate
+cd ai-content-pipeline
+
+python -m venv .venv
+source .venv/bin/activate
+
 pip install -r requirements.txt
+```
 
-# 2. (optional) configure live keys — skip this to run fully mocked
-cp .env.example .env        # then fill in ANTHROPIC_API_KEY / HubSpot token
+Run the pipeline:
 
-# 3. run the full pipeline (pick a company profile)
-python main.py run --company zip
-python main.py run --company shopify
-python main.py run --profile examples/zip.json   # or any custom profile JSON
-#   (optional) override the seed topic:  --topic "Your topic here"
+```bash
+python main.py run --profile examples/zip.json
+```
 
-# 4. inspect accumulated history & lifetime averages
+Run another company profile:
+
+```bash
+python main.py run --profile examples/shopify.json
+python main.py run --profile examples/datadog.json
+```
+
+Inspect campaign history:
+
+```bash
 python main.py history
+```
 
-# 5. ask for next-content ideas from history alone
+Generate optimization recommendations from history:
+
+```bash
 python main.py optimize
 ```
 
-### Dashboard (bonus)
+---
+
+## Dashboard
+
+Start the dashboard:
 
 ```bash
-python dashboard/app.py        # then open http://127.0.0.1:5000
+python dashboard/app.py
 ```
 
-Enter a topic, hit **Run pipeline**, and watch content, segment performance, the AI
-summary, and the optimization slate populate. (Best viewed in a modern browser.)
+Then open:
 
-### Going live
+```text
+http://127.0.0.1:5000
+```
 
-| Set in `.env` | Effect |
-|---|---|
-| `ANTHROPIC_API_KEY=sk-ant-...` | content + summaries generated by Claude |
-| `HUBSPOT_ACCESS_TOKEN=...` + `HUBSPOT_MODE=live` | requests actually sent to HubSpot |
-| `SIM_SEED=` (blank) | fresh randomized engagement each run |
-
-Startup prints a banner, e.g. `LLM=LIVE (Claude) | CRM=mock | sim_seed=42`, so you
-always know which subsystems are live.
+The dashboard provides a simple control room for reviewing generated content, segment performance, campaign summaries, and optimization recommendations.
 
 ---
 
-## Design notes
+## Mock vs. Live Mode
 
-- **Provider-agnostic LLM seam.** Everything goes through `LLM.complete()` /
-  `complete_json()`. Swapping Claude for OpenAI/Gemini is one file.
-- **Same code, two front-ends.** CLI and dashboard share the pipeline; nothing is
-  reimplemented for the UI.
-- **History is first-class.** Metrics persist to SQLite keyed by `(campaign, persona)`,
-  enabling the lifetime averages and trend-aware optimization the brief asks for.
-- **Graceful degradation over hard failure.** A missing key or a malformed model
-  response degrades to a sensible default rather than crashing the run.
+The workflow runs with zero API keys by default.
 
-## If I had more time
+External dependencies are mocked cleanly so a reviewer can clone and run the project without setting up Anthropic or HubSpot credentials.
 
-- Real A/B send-time testing with a HubSpot workflow + winner promotion.
-- A proper scheduler (cron / GitHub Action) for the "weekly" cadence.
-- Statistical significance checks before acting on a persona's rate delta.
-- Pull *real* opens/clicks back from HubSpot's analytics API to replace the simulator.
+| Mode          | What happens                                                               |
+| ------------- | -------------------------------------------------------------------------- |
+| Mock mode     | Uses deterministic content, mock CRM actions, and simulated engagement     |
+| Live LLM mode | Uses Anthropic Claude if `ANTHROPIC_API_KEY` is provided                   |
+| Live CRM mode | Sends real HubSpot requests if `HUBSPOT_MODE=live` and a token is provided |
+
+Use `.env.example` as the setup reference.
+
+---
+
+## Tools and Technologies
+
+| Area            | Tool                             |
+| --------------- | -------------------------------- |
+| Language        | Python                           |
+| LLM integration | Anthropic Claude / mock fallback |
+| CRM simulation  | HubSpot-style CRM flow           |
+| Storage         | SQLite                           |
+| Dashboard       | Flask + Jinja2                   |
+| Output format   | JSON + Markdown                  |
+
+---
+
+## HubSpot-Style CRM Flow
+
+The CRM stage simulates realistic marketing operations:
+
+| Action               | Example behavior                                    |
+| -------------------- | --------------------------------------------------- |
+| Contact upsert       | Creates or updates contacts with persona properties |
+| Persona segmentation | Groups contacts into persona-based lists            |
+| Newsletter send      | Sends a persona-specific content variant            |
+| Campaign logging     | Records campaign activity and engagement data       |
+
+In mock mode, the workflow builds the request structure and logs it locally instead of sending it to a live CRM.
+
+---
+
+## Outputs
+
+The workflow can generate:
+
+* Audience personas
+* Blog content
+* Persona-specific newsletter variants
+* Campaign performance metrics
+* AI-style performance summaries
+* Optimization recommendations
+* Local history of generated outputs
+
+---
+
+## Design Notes
+
+* **PMM-first workflow:** The system is designed around product marketing tasks, not just content generation.
+* **Same logic, multiple front ends:** CLI and dashboard share the same pipeline modules.
+* **Mock-first design:** The project can run without API keys, which makes it easy to demo.
+* **History-aware optimization:** Campaign metrics persist locally so the system can recommend next topics and headline tests.
+* **Modular architecture:** Each PMM workflow step lives in its own module.
+
+---
+
+## If I Had More Time
+
+* Add real A/B testing workflow support
+* Add competitive positioning output
+* Add sales enablement brief generation
+* Add customer interview synthesis
+* Pull real engagement data from HubSpot analytics
+* Add a scheduler for weekly content and campaign recommendations
