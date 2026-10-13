@@ -41,6 +41,8 @@ def _latest_report() -> dict | None:
 
 
 def _run_pipeline(topic: str):
+    if config.HUBSPOT_LIVE:
+        raise HubSpotIntegrationError("Run pipeline is disabled in live CRM mode because legacy marketing sends are not validated. Set HUBSPOT_MODE=mock; use the separate HubSpot live controls for safe test records.")
     campaign_id = "cmp_" + datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S_%f")
     run_dir = config.RUNS_DIR / campaign_id
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -118,7 +120,10 @@ def hubspot_segment():
 @app.route("/run", methods=["POST"])
 def run():
     topic = (request.form.get("topic") or "AI in creative automation").strip()
-    _run_pipeline(topic)
+    try:
+        _run_pipeline(topic)
+    except HubSpotIntegrationError as exc:
+        flash(str(exc), "error")
     return redirect(url_for("index"))
 
 
