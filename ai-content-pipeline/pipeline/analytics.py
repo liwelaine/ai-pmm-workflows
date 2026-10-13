@@ -6,6 +6,8 @@ persona's baseline rates plus run-to-run noise. Results are written to SQLite
 with recommendations.
 """
 
+from __future__ import annotations
+
 import random
 
 import config
