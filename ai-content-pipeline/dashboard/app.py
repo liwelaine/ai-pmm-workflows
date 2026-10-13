@@ -6,6 +6,8 @@ It reuses the exact same pipeline modules as the CLI, so the dashboard is a
 thin view layer, not a parallel implementation.
 """
 
+from __future__ import annotations
+
 import json
 import sys
 from datetime import datetime, timezone
