@@ -14,7 +14,7 @@ from pathlib import Path
 # Make the project root importable when run as `python dashboard/app.py`.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from flask import Flask, redirect, render_template, request, url_for  # noqa: E402
+from flask import Flask, redirect, render_template, request, url_for, flash  # noqa: E402
 
 import config  # noqa: E402
 from pipeline import (  # noqa: E402
@@ -26,9 +26,11 @@ from pipeline import (  # noqa: E402
 )
 from pipeline.crm import HubSpotClient  # noqa: E402
 from pipeline.llm import LLM  # noqa: E402
+from pipeline.hubspot_live import HubSpotLive, HubSpotIntegrationError  # noqa: E402
 from pipeline.personas import PERSONA_BY_ID, PERSONAS  # noqa: E402
 
 app = Flask(__name__)
+app.secret_key = __import__('os').environ.get('FLASK_SECRET_KEY') or __import__('secrets').token_hex(32)
 
 
 def _latest_report() -> dict | None:
@@ -66,6 +68,7 @@ def index():
     report = _latest_report()
     return render_template(
         "index.html",
+        hubspot_configured=HubSpotLive().configured,
         mode=config.mode_banner(),
         report=report,
         personas=PERSONAS,
@@ -73,6 +76,43 @@ def index():
         campaigns=storage.all_campaigns(),
         averages=[a for a in storage.averages_by_persona() if a["persona_id"] in PERSONA_BY_ID],
     )
+
+
+@app.route("/hubspot/test", methods=["POST"])
+def hubspot_test():
+    try:
+        result = HubSpotLive().test_connection()
+        flash(f"HubSpot connected successfully (read-only check; {result['contacts_visible_in_sample']} sample contact visible).", "success")
+    except HubSpotIntegrationError as exc:
+        flash(str(exc), "error")
+    return redirect(url_for("index"))
+
+
+@app.route("/hubspot/contact", methods=["POST"])
+def hubspot_contact():
+    try:
+        persona = request.form.get("persona", "")
+        if persona not in PERSONA_BY_ID:
+            raise HubSpotIntegrationError("Please select a valid persona.")
+        result = HubSpotLive().sync_test_contact(
+            request.form.get("email", ""), persona, request.form.get("first_name", ""))
+        flash(f"HubSpot contact {result['action']}: {result['email']} ({persona}).", "success")
+    except HubSpotIntegrationError as exc:
+        flash(str(exc), "error")
+    return redirect(url_for("index"))
+
+
+@app.route("/hubspot/segment", methods=["POST"])
+def hubspot_segment():
+    try:
+        persona = request.form.get("persona", "")
+        if persona not in PERSONA_BY_ID:
+            raise HubSpotIntegrationError("Please select a valid persona.")
+        result = HubSpotLive().create_demo_segment(persona)
+        flash(f"HubSpot dynamic segment created: {result['name']}.", "success")
+    except HubSpotIntegrationError as exc:
+        flash(str(exc), "error")
+    return redirect(url_for("index"))
 
 
 @app.route("/run", methods=["POST"])
@@ -83,4 +123,4 @@ def run():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(debug=False, host="127.0.0.1", port=5000)
