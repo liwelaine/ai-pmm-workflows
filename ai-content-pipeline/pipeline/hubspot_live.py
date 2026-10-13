@@ -137,8 +137,12 @@ class HubSpotLive:
             "processingType": "DYNAMIC",
             "filterBranch": {
                 "filterBranchType": "OR",
+                "filterBranchOperator": "OR",
+                "filters": [],
                 "filterBranches": [{
                     "filterBranchType": "AND",
+                    "filterBranchOperator": "AND",
+                    "filterBranches": [],
                     "filters": [{
                         "filterType": "PROPERTY",
                         "property": PERSONA_PROPERTY,
