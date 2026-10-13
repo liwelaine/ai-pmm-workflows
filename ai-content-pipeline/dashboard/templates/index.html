@@ -115,6 +115,45 @@
     <button class="btn" type="submit">▷ Run pipeline</button>
   </form>
 
+
+  <!-- HubSpot live CRM controls; deliberately separate from the simulated pipeline. -->
+  <div class="sec"><span class="n">CRM</span><h2>HubSpot live connection</h2><span class="rule"></span></div>
+  <div class="pcard" style="margin-bottom:20px">
+    <p style="color:var(--muted);font-size:13px">Optional live integration. Test your connection, sync one test contact you control, or create one demo persona segment. These actions write to your HubSpot account only when you click them. No emails are sent. Campaign analytics below remain simulated.</p>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <p style="padding:10px;border-radius:7px;background:var(--panel-2);border:1px solid {{ 'var(--lime)' if category == 'success' else 'var(--coral)' }};font-size:13px">{{ message }}</p>
+      {% endfor %}
+    {% endwith %}
+    <div class="label">Connection · {{ "TOKEN CONFIGURED" if hubspot_configured else "NOT CONFIGURED" }}</div>
+    <form method="post" action="/hubspot/test" style="margin:12px 0 24px">
+      <button class="btn" type="submit" style="padding:9px 14px">Test HubSpot connection</button>
+    </form>
+    <div class="two">
+      <form method="post" action="/hubspot/contact" class="pcard" style="background:var(--panel-2)">
+        <div class="label">Sync one test contact</div>
+        <label for="hs-email" style="font-size:12px">Email you own / control</label>
+        <input id="hs-email" name="email" type="email" required placeholder="you@example.com" style="width:100%;padding:9px;margin:7px 0 10px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:7px">
+        <label for="hs-first" style="font-size:12px">First name (optional)</label>
+        <input id="hs-first" name="first_name" placeholder="Test" style="width:100%;padding:9px;margin:7px 0 10px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:7px">
+        <label for="hs-persona" style="font-size:12px">Persona</label>
+        <select id="hs-persona" name="persona" required style="width:100%;padding:10px;margin:7px 0 14px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:7px">
+          {% for p in personas %}<option value="{{ p.id }}">{{ p.name }}</option>{% endfor %}
+        </select>
+        <button class="btn" type="submit" style="padding:10px 14px">Sync test contact to HubSpot</button>
+      </form>
+      <form method="post" action="/hubspot/segment" class="pcard" style="background:var(--panel-2)">
+        <div class="label">Create demo active list</div>
+        <p style="font-size:13px;color:var(--muted)">Creates a dynamic list filtered by the PMM demo persona contact property. Requires HubSpot list permissions; repeat clicks may create duplicate lists.</p>
+        <label for="hs-list-persona" style="font-size:12px">Persona</label>
+        <select id="hs-list-persona" name="persona" style="width:100%;padding:10px;margin:7px 0 14px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:7px">
+          {% for p in personas %}<option value="{{ p.id }}">{{ p.name }}</option>{% endfor %}
+        </select>
+        <button class="btn" type="submit" style="padding:10px 14px">Create demo list in HubSpot</button>
+      </form>
+    </div>
+  </div>
+
   {% if not report %}
     <div class="pcard empty">No campaigns yet. Enter a topic above and run the pipeline to generate content, distribute it, and see performance here.</div>
   {% else %}
