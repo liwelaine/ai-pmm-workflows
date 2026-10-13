@@ -30,6 +30,7 @@ from pipeline.crm import HubSpotClient  # noqa: E402
 from pipeline.llm import LLM  # noqa: E402
 from pipeline.hubspot_live import HubSpotLive, HubSpotIntegrationError  # noqa: E402
 from pipeline.personas import PERSONA_BY_ID, PERSONAS  # noqa: E402
+from pipeline.workspaces import BILLABLES_WORKSPACE  # noqa: E402
 
 app = Flask(__name__)
 app.secret_key = __import__('os').environ.get('FLASK_SECRET_KEY') or __import__('secrets').token_hex(32)
@@ -80,6 +81,12 @@ def index():
         campaigns=storage.all_campaigns(),
         averages=[a for a in storage.averages_by_persona() if a["persona_id"] in PERSONA_BY_ID],
     )
+
+
+@app.route("/workspace/billables-ai")
+def billables_workspace():
+    """Present the first company workspace and the Managing Partner persona."""
+    return render_template("workspace.html", workspace=BILLABLES_WORKSPACE)
 
 
 @app.route("/hubspot/test", methods=["POST"])
