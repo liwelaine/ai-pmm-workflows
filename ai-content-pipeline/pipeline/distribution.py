@@ -5,6 +5,8 @@ persona, ensures a segment list per persona, then sends each persona the matchin
 newsletter variant. Returns a send manifest used by the analytics stage.
 """
 
+from __future__ import annotations
+
 import json
 from datetime import date
 
