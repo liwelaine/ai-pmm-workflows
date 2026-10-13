@@ -4,6 +4,8 @@ Real operations are intentionally limited to connectivity, a user-submitted
 test contact, and an explicitly requested dynamic segment. No email is sent.
 Never expose HUBSPOT_ACCESS_TOKEN to the browser or commit it to GitHub.
 """
+
+from __future__ import annotations
 import re
 from urllib.parse import quote
 
