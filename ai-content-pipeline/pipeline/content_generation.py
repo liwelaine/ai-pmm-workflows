@@ -7,6 +7,8 @@ Given a topic, produce:
 Returned as a single structured dict and persisted as JSON + Markdown.
 """
 
+from __future__ import annotations
+
 import json
 from datetime import datetime, timezone
 
