@@ -15,6 +15,8 @@ the segment key. (In production you'd back this with a HubSpot Active List
 filtered on that property; the property write is the realistic primitive.)
 """
 
+from __future__ import annotations
+
 import json
 import uuid
 
