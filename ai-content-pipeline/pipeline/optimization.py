@@ -4,6 +4,8 @@ Reads accumulated engagement history and asks the LLM to recommend the next
 blog topics and headline variants, biased toward what has actually performed.
 """
 
+from __future__ import annotations
+
 from . import storage
 from .llm import LLM
 from .personas import PERSONA_BY_ID
