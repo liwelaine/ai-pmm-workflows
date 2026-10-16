@@ -86,7 +86,7 @@ class HubSpotClient:
         Filter: contact property `persona` == <segment>
         """
         payload = {
-            "name": f"NovaMind · {persona_id}",
+            "name": f"AI Content Pipeline · {persona_id}",
             "objectTypeId": "0-1",  # contacts
             "processingType": "DYNAMIC",
             "filterBranch": {

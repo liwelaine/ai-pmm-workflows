@@ -1,1 +1,1 @@
-"""NovaMind AI content pipeline package."""
+"""AI Content Pipeline package."""

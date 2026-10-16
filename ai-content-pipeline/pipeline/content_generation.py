@@ -31,7 +31,7 @@ def generate_content(topic: str, llm: LLM | None = None) -> dict:
     prompt = f"""[[TASK:CONTENT]]
 TOPIC: {topic}
 
-Write one weekly blog post for NovaMind and then derive three newsletter variants,
+Write one weekly blog post for {company['name']} and then derive three newsletter variants,
 one per persona below. Personas:
 {persona_brief}
 

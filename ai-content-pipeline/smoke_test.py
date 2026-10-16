@@ -8,7 +8,7 @@ client = a.app.test_client()
 r = client.get("/")
 html = r.get_data(as_text=True)
 assert r.status_code == 200, r.status_code
-for needle in ["NOVA<b>MIND</b>", "Segment performance", "AI performance summary",
+for needle in ["AI<b> Content Pipeline</b>", "Segment performance", "AI performance summary",
                "Headline A/B options", "Avg click", "Click rate"]:
     assert needle in html, f"missing: {needle}"
 print("GET /            -> 200, all sections present")

@@ -1,4 +1,4 @@
-"""NovaMind Content Pipeline — CLI orchestrator.
+"""AI Content Pipeline — CLI orchestrator.
 
 Runs the full loop end-to-end:
     generate content -> distribute via CRM -> log & analyze performance ->
@@ -48,7 +48,7 @@ def cmd_run(args):
     run_dir = config.RUNS_DIR / campaign_id
     run_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"NovaMind pipeline | company={active_company()['name']} | {config.mode_banner()}")
+    print(f"AI Content Pipeline | company={active_company()['name']} | {config.mode_banner()}")
     print(f"Campaign: {campaign_id}  ·  topic: {topic!r}")
 
     llm = LLM()
@@ -143,7 +143,7 @@ def cmd_optimize(args):
 
 
 def build_parser():
-    p = argparse.ArgumentParser(description="NovaMind AI content pipeline")
+    p = argparse.ArgumentParser(description="AI content pipeline")
     sub = p.add_subparsers(dest="command", required=True)
 
     run = sub.add_parser("run", help="run the full pipeline for a topic")

@@ -11,7 +11,7 @@ from .llm import LLM
 from .personas import PERSONA_BY_ID
 
 SYSTEM = (
-    "You are NovaMind's content strategist. Using real engagement data, you decide "
+    "You are a B2B content strategist. Using real engagement data, you decide "
     "what to publish next and how to title it to maximize click-through."
 )
 
