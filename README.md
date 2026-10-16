@@ -16,6 +16,17 @@ This repository is designed as a product marketing portfolio project, not just a
 
 ---
 
+## Live HubSpot Performance Dashboard (Read Only)
+
+The local Flask app now provides **two clearly separated experiences**:
+
+- [Interactive portfolio prototype](docs/demo.html) — prepared company examples with simulated performance, safe to share on GitHub Pages.
+- **Real HubSpot email performance** — run Flask locally and open \`http://127.0.0.1:5000/performance\`. It retrieves real email statistics, rates, time trends, and recent emails directly from HubSpot. A server-side private app token is required; the page shows no fake metrics when unavailable.
+
+See [HubSpot live setup](ai-content-pipeline/HUBSPOT_LIVE_SETUP.md) for the few local setup steps. GitHub Pages does **not** run Python and must never contain a HubSpot token.
+
+---
+
 ## Workflow at a Glance
 
 ```mermaid
