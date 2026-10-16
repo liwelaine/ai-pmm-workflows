@@ -31,9 +31,11 @@ from pipeline.llm import LLM  # noqa: E402
 from pipeline.hubspot_live import HubSpotLive, HubSpotIntegrationError  # noqa: E402
 from pipeline.personas import PERSONA_BY_ID, PERSONAS  # noqa: E402
 from pipeline.workspaces import BILLABLES_WORKSPACE  # noqa: E402
+from dashboard.performance import performance_bp  # noqa: E402
 
 app = Flask(__name__)
 app.secret_key = __import__('os').environ.get('FLASK_SECRET_KEY') or __import__('secrets').token_hex(32)
+app.register_blueprint(performance_bp)
 
 
 def _latest_report() -> dict | None:
@@ -81,6 +83,13 @@ def index():
         campaigns=storage.all_campaigns(),
         averages=[a for a in storage.averages_by_persona() if a["persona_id"] in PERSONA_BY_ID],
     )
+
+
+@app.get("/prototype")
+def prototype():
+    """Serve the static, clearly labeled interview preview from the same local app."""
+    from flask import send_file
+    return send_file(Path(__file__).resolve().parents[2] / "docs" / "demo.html")
 
 
 @app.route("/workspace/billables-ai")
