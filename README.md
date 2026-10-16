@@ -6,6 +6,16 @@ This repository is designed as a product marketing portfolio project, not just a
 
 ---
 
+## 🎯 Try the Interview Demo (No Setup)
+
+**Start here if you are reviewing this portfolio.** The [interactive workflow playground](docs/demo.html) lets you select Zip, Shopify, or Datadog and explore audience segmentation, persona-specific content, simulated performance, and optimization decisions without installing anything.
+
+- **For a hosted browser demo:** publish the `docs/` folder with GitHub Pages, then open `https://liwelaine.github.io/ai-pmm-workflows/demo.html`.
+- **For a local, offline demo:** download `docs/demo.html` and open it in a browser.
+- **For the actual Python pipeline:** follow the CLI or Flask instructions below. The browser demo is a prepared example replay, **not** a live Claude generation, HubSpot send, or real campaign dataset.
+
+---
+
 ## Workflow at a Glance
 
 ```mermaid
