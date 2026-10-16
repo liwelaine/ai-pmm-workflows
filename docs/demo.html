@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore a no-setup, interactive example of an AI-native product marketing workflow: segment audiences, preview tailored content, and learn from simulated engagement.">
+  <title>AI PMM Workflow Playground | Elaine Lee</title>
+  <style>
+    :root{--ink:#15212b;--muted:#60717b;--line:#dce6e7;--surface:#fff;--paper:#f5f8f7;--teal:#087f78;--teal2:#e8f7f3;--violet:#5f5bcd;--navy:#172b39}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    a{color:var(--teal);text-decoration:none}a:hover{text-decoration:underline}
+    button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #8ed4ca;outline-offset:3px}
+    .wrap{max-width:1160px;margin:0 auto;padding:0 24px}nav{background:#fff;border-bottom:1px solid var(--line)}.nav-inner{height:68px;display:flex;align-items:center;justify-content:space-between;gap:15px}.brand{font-size:16px;font-weight:850;letter-spacing:-.04em;color:var(--ink)}.brand b{color:var(--teal)}.nav-right{display:flex;gap:24px;font-size:13px;font-weight:600;align-items:center}
+    .hero{padding:53px 0 32px}.eyebrow{font-size:11px;text-transform:uppercase;font-weight:800;letter-spacing:.13em;color:var(--teal)}h1{max-width:920px;font-size:clamp(35px,5.2vw,60px);line-height:1.08;letter-spacing:-.055em;margin:12px 0 19px;font-weight:820}h1 em{color:var(--teal);font-style:normal}.sub{font-size:17px;max-width:820px;color:#53646d;margin:0 0 20px}.explain{display:flex;gap:9px;align-items:flex-start;max-width:950px;font-size:12.5px;color:#596e70;background:#e7f2f0;border:1px solid #ccdfdc;border-radius:10px;padding:11px 14px}.explain strong{color:#166a65}
+    .grid{display:grid;grid-template-columns:minmax(0,1.07fr) minmax(0,.93fr);gap:18px;margin:20px 0 32px}.panel{background:var(--surface);border:1px solid var(--line);border-radius:17px;padding:25px;box-shadow:0 4px 20px #21353b07}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:17px}.panel-head h2{font-size:21px;letter-spacing:-.035em;margin:0}.step{font-size:11px;font-weight:850;letter-spacing:.08em;color:var(--teal);text-transform:uppercase}.mini{font-size:12px;color:var(--muted)}.choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:20px}.choice{padding:14px 12px;border:1px solid var(--line);background:#fff;border-radius:11px;text-align:left;min-height:95px;transition:border-color .15s,background .15s}.choice.selected,.choice[aria-pressed=true]{border:2px solid var(--teal);background:var(--teal2);padding:13px 11px}.choice strong{display:block;font-size:16px;letter-spacing:-.03em;margin-bottom:4px}.choice span{display:block;color:var(--muted);font-size:12px;line-height:1.3}.field-label{color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.09em;margin:15px 0 4px}.value{font-size:15px;line-height:1.5}.topic{margin:7px 0 15px;padding:12px 14px;border:1px solid #d9e7e6;border-radius:9px;background:#f7fbfa;font-weight:700}.button{display:inline-flex;gap:8px;align-items:center;justify-content:center;border:0;border-radius:10px;background:var(--teal);color:#fff;font-weight:750;padding:13px 18px}.button:hover{background:#086e69}.button:disabled{opacity:.6;cursor:wait}.button.secondary{background:#f0f5f4;color:#235a55;border:1px solid #cadbd9}.run-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.engine-badge{background:#f5f2fe;color:#5651a1;font-size:11px;padding:5px 9px;border-radius:20px;font-weight:800}
+    .flow-list{display:grid;gap:12px}.flow-step{display:flex;align-items:flex-start;gap:12px;padding:13px;border:1px solid #e1e9e9;border-radius:11px;background:#f9fbfb}.number{display:grid;place-items:center;width:31px;height:31px;flex:none;border:1px solid #c8d8d9;border-radius:9px;color:#3b6665;font-weight:800}.flow-step.done{background:#eff8f5;border-color:#b7dbd2}.flow-step.done .number{background:#0a8077;color:#fff;border-color:#0a8077}.flow-step.current{border-color:var(--teal)}.flow-step strong{display:block;font-size:14px}.flow-step p{color:var(--muted);font-size:12px;margin:3px 0 0}.status{font-size:12px;color:#647679;margin:16px 0 0}
+    .results{scroll-margin-top:20px;margin-bottom:50px}.section-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-end;margin:7px 0 14px;flex-wrap:wrap}.section-head h2{font-size:27px;margin:3px 0 0;letter-spacing:-.04em}.tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:17px}.tab{border:0;border-radius:9px;background:transparent;color:#53666e;padding:10px 13px;font-size:13px;font-weight:750}.tab.active{background:var(--navy);color:#fff}.content-grid{display:grid;grid-template-columns:280px minmax(0,1fr);gap:18px}.personas{display:grid;gap:9px;align-content:start}.persona{width:100%;border:1px solid var(--line);border-radius:10px;padding:13px;background:#fff;text-align:left;color:var(--ink)}.persona strong{font-size:13px;display:block}.persona small{color:var(--muted);display:block;margin-top:3px}.persona.active{border:2px solid var(--teal);background:var(--teal2);padding:12px}
+    .card{padding:19px;border:1px solid var(--line);border-radius:12px;background:#fff}.card h3{font-size:20px;letter-spacing:-.025em;margin:4px 0 10px}.pill{background:#eff4f4;color:#516a70;border-radius:6px;padding:4px 7px;display:inline-block;font-size:11px;font-weight:750;margin:2px 5px 7px 0}.quote{font-size:17px;font-weight:650;line-height:1.45;letter-spacing:-.02em}.newsletter{white-space:pre-wrap;background:#f8fbfa;border:1px solid #e2eaea;border-radius:11px;padding:19px;font-size:14px;line-height:1.7}.muted{color:var(--muted)}.metric-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin:15px 0}.metric-card{padding:16px;border:1px solid var(--line);border-radius:11px;background:#fff}.metric-num{font-size:28px;letter-spacing:-.05em;font-weight:830;color:var(--teal)}.metric-caption{font-size:12px;color:var(--muted)}.chart-row{display:grid;grid-template-columns:180px 1fr 65px;align-items:center;gap:10px;margin:14px 0;font-size:13px}.track{height:9px;border-radius:12px;background:#ecf0f0;overflow:hidden}.fill{height:100%;background:var(--teal);border-radius:12px}.notice{background:#fff8e7;border:1px solid #f0e0b0;padding:12px 14px;border-radius:9px;color:#77613c;font-size:12px;line-height:1.55;margin:0 0 15px}.recommendations{display:grid;grid-template-columns:1fr 1fr;gap:14px}.rec{padding:18px;background:#f8fbfa;border:1px solid var(--line);border-radius:11px}.rec strong{display:block;font-size:12px;color:var(--teal);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px}.rec h3{font-size:16px;margin:0 0 8px}.rec p,.rec li{color:#465c64;font-size:13px}.rec ul{padding-left:19px;margin:8px 0}.tiny-heading{color:var(--teal);font-size:11px;font-weight:820;letter-spacing:.1em;text-transform:uppercase}.footer{border-top:1px solid var(--line);padding:20px 0 44px;color:var(--muted);font-size:12px}
+    @media(max-width:830px){.grid,.content-grid,.recommendations{grid-template-columns:1fr}.personas{display:flex;overflow-x:auto}.persona{min-width:195px}.nav-right{gap:11px}.chart-row{grid-template-columns:125px 1fr 55px}}
+    @media(max-width:550px){.wrap{padding:0 16px}.choices{grid-template-columns:1fr}.choice{min-height:0}.hero{padding-top:34px}.panel{padding:18px}.metric-grid{grid-template-columns:1fr}.nav-right a:first-child{display:none}.tab{padding:9px 9px}}
+  </style>
+</head>
+<body>
+<nav><div class="wrap nav-inner">
+  <a class="brand" href="./index.html">ELAINE <b>/</b> PMM LAB</a>
+  <div class="nav-right"><a href="./index.html">Read the case study</a><a href="https://github.com/liwelaine/ai-pmm-workflows" target="_blank" rel="noopener">View source ↗</a></div>
+</div></nav>
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">Interactive portfolio · AI + Product Marketing</div>
+    <h1>One company brief.<br><em>Three different customer stories.</em></h1>
+    <p class="sub">See how a product marketer turns audience strategy into tailored content, a segmented campaign, and next-step decisions. Pick a company and explore the outputs yourself.</p>
+    <div class="explain" role="note"><span aria-hidden="true">ⓘ</span><span><strong>Interview-safe sample demo.</strong> This browser replays prepared company profiles and illustrative engagement figures. It does not call Claude, send email, connect to HubSpot, or claim real campaign results. The <a href="https://github.com/liwelaine/ai-pmm-workflows/tree/main/ai-content-pipeline" target="_blank" rel="noopener">Python pipeline</a> runs separately in mock mode or with configured integrations.</span></div>
+  </header>
+  <main>
+    <div class="grid">
+      <section class="panel" aria-labelledby="choose-title">
+        <div class="panel-head"><div><div class="step">Step 01 · Make a PMM decision</div><h2 id="choose-title">Choose a company</h2></div><span class="engine-badge">No setup needed</span></div>
+        <div class="choices" id="company-choices" role="group" aria-label="Company examples">
+          <button type="button" class="choice selected" data-company="zip" aria-pressed="true"><strong>Zip</strong><span>Enterprise procurement</span></button>
+          <button type="button" class="choice" data-company="shopify" aria-pressed="false"><strong>Shopify</strong><span>SMB commerce</span></button>
+          <button type="button" class="choice" data-company="datadog" aria-pressed="false"><strong>Datadog</strong><span>Cloud and AI operations</span></button>
+        </div>
+        <div class="field-label">What the company sells</div><div class="value" id="context"></div>
+        <div class="field-label">How I segment the audience and why</div><div class="value" id="logic"></div>
+        <div class="field-label">Sample campaign topic</div><div class="topic" id="topic"></div>
+        <div class="run-row">
+          <button id="run" type="button" class="button">▶ Run sample workflow</button>
+          <span class="mini">Preview data is available below before you run.</span>
+        </div>
+      </section>
+      <section class="panel" aria-label="Workflow steps">
+        <div class="panel-head"><div><div class="step">Step 02 · Watch the system</div><h2>From strategy to next action</h2></div></div>
+        <div class="flow-list" id="flow">
+          <div class="flow-step"><span class="number">1</span><div><strong>Define the audience</strong><p>Map buyer roles or growth stages, not generic demographics.</p></div></div>
+          <div class="flow-step"><span class="number">2</span><div><strong>Tailor the message</strong><p>Same company, different pain points and subject lines.</p></div></div>
+          <div class="flow-step"><span class="number">3</span><div><strong>Model the campaign</strong><p>See who would receive each version and compare illustrative engagement.</p></div></div>
+          <div class="flow-step"><span class="number">4</span><div><strong>Choose the next experiment</strong><p>Turn the strongest persona signal into a content hypothesis.</p></div></div>
+        </div>
+        <p id="run-status" class="status" role="status">Ready. Select a company or explore the sample outputs below.</p>
+      </section>
+    </div>
+    <section id="results" class="results">
+      <div class="section-head"><div><div class="step">Step 03 · Explore the deliverables</div><h2>Campaign output <span id="output-company" class="muted"></span></h2></div><button type="button" id="copy" class="button secondary">Copy interview summary</button></div>
+      <div class="tabs" id="tabs" role="tablist" aria-label="Workflow deliverables">
+        <button type="button" role="tab" class="tab active" data-tab="audience" aria-selected="true">01 Audience strategy</button>
+        <button type="button" role="tab" class="tab" data-tab="content" aria-selected="false">02 Content preview</button>
+        <button type="button" role="tab" class="tab" data-tab="metrics" aria-selected="false">03 Performance</button>
+        <button type="button" role="tab" class="tab" data-tab="next" aria-selected="false">04 Next experiment</button>
+      </div>
+      <div id="tab-content" role="tabpanel" aria-live="polite"></div>
+    </section>
+  </main>
+</div>
+<footer class="footer"><div class="wrap">Built as a portfolio demonstration by I-Wen (Elaine) Lee. Company profiles are editorial examples. All email and performance results here are illustrative. <a href="https://github.com/liwelaine/ai-pmm-workflows">Inspect the Python source and setup instructions ↗</a></div></footer>
+<script>
+(function(){
+"use strict";
+const DATA={
+  zip:{
+    name:"Zip",context:"AI-powered procurement orchestration that gives employees one place to request purchases while procurement and finance retain visibility.",logic:"Organizational role. A procurement leader, finance approver, and requester interact with the same product but need very different outcomes.",topic:"How to scale procurement without scaling headcount",
+    blog:"Every growing company hits the same wall. Headcount climbs, purchasing requests multiply, and procurement quietly becomes the team everyone waits on. The instinct is to hire more buyers, but that only scales the bottleneck. The alternative is orchestration: one front door for every request, with approvals and reviews handled behind the scenes.",
+    personas:[
+      {name:"Procurement Leader",role:"Champion · CPO / VP",angle:"Scale procurement without adding headcount, cut approval cycles, become a strategic partner.",size:280,open:47,click:18,unsub:.4,subject:"Scale procurement without scaling your team",preview:"Stop being the bottleneck.",body:"As the business grows, every new hire means more requests landing on your team. See how a single intake-to-pay process helps procurement move from gatekeeper to strategic partner.\n\n→ Read the playbook"},
+      {name:"Finance Leader",role:"Economic buyer · CFO / Finance Ops",angle:"See spend before it is committed, control cost while keeping the business moving.",size:220,open:44,click:15,unsub:.6,subject:"See every dollar before it's committed",preview:"Control without slowing the business.",body:"The spend that hurts is the spend you discover after it is committed. See how teams gain visibility before approvals and reduce unnecessary tool spend.\n\n→ Explore the finance view"},
+      {name:"Business Requester",role:"End user · Any employee",angle:"A simple purchase experience, transparent status, fewer email chains.",size:900,open:40,click:11,unsub:.9,subject:"Buy what you need, without the back-and-forth",preview:"One front door for every request.",body:"Need a new tool or vendor? Skip the guessing and email chains. Submit once and see exactly where your request stands.\n\n→ See how it works"}
+    ],
+    topics:["From gatekeeper to strategic partner: a procurement leader's playbook","The intake front door: why request experience drives policy adoption","Where AI can remove manual steps in procurement"],
+    tests:["A: Scale procurement without scaling headcount","B: Stop being the procurement bottleneck"],
+    rationale:"In these sample assumptions, procurement leaders have the strongest click rate. I would test scale-without-headcount messaging with that group before expanding spend."
+  },
+  shopify:{
+    name:"Shopify",context:"A commerce platform helping entrepreneurs start, operate, and grow stores online and in person.",logic:"Business maturity. A new store needs first sales; a growing brand needs retention; an established retailer needs operational simplicity.",topic:"What separates stores that scale from stores that stall",
+    blog:"Most advice for online stores assumes everyone has the same problem. They do not. New founders need to get to the first hundred orders without tool overload. Growing brands need to turn one-time buyers into repeat customers. Established retailers need to bring online and in-person operations together.",
+    personas:[
+      {name:"First-time Founder",role:"Just starting · First 100 orders",angle:"Make the first sale without overwhelming tools or complexity.",size:1200,open:42,click:14,unsub:1,subject:"Your first sale is closer than you think",preview:"Start simple. Ship today.",body:"Starting a store can feel like there are a hundred things to set up. There aren't. Here's the shortest path to your first 100 orders: one storefront, one channel, and room to learn.\n\n→ Read the starter guide"},
+      {name:"Growing DTC Brand",role:"Scaling · Repeatable revenue",angle:"Convert one-time shoppers into returning buyers and build repeatable growth.",size:600,open:47,click:19,unsub:.5,subject:"From steady sales to a real growth engine",preview:"Turn buyers into repeat buyers.",body:"You have sales coming in. Now make them compound. Learn how growing brands build retention through email flows, better customer insight, and repeat purchases.\n\n→ See the retention playbook"},
+      {name:"Established Retailer",role:"Omnichannel · Store and website",angle:"Unify inventory and operations so adding sales channels does not double workload.",size:300,open:43,click:13,unsub:.6,subject:"One back office for your store and website",preview:"Stop running two businesses.",body:"If the shop and website run on separate systems, growth means more work. See how to unify inventory and operations across channels.\n\n→ Explore the omnichannel guide"}
+    ],
+    topics:["Email flows that turn one-time buyers into repeat customers","The first-100-orders playbook","Going omnichannel without doubling your workload"],
+    tests:["A: Build a repeat-customer engine","B: Turn your next sale into the next ten"],
+    rationale:"In this example, growing brands have the strongest click rate. I would prioritize a retention-focused content test rather than send another generic growth newsletter."
+  },
+  datadog:{
+    name:"Datadog",context:"A cloud observability and security platform that helps technical and business teams monitor applications, AI, infrastructure, and costs.",logic:"Accountability in production. Platform teams own visibility, on-call teams own incidents, security owns risk, and finance owns spend.",topic:"Your AI is in production. Can you see what it's doing?",
+    blog:"Most teams shipped their first AI features faster than they built a way to watch them. The model is live, calling tools and using compute, yet its behavior shows up in a separate dashboard. During an incident, engineers must piece together telemetry, security signals, and cost data just to find out what happened.",
+    personas:[
+      {name:"Engineering Leader",role:"Platform owner · Reliability",angle:"Unify context across cloud, applications, and AI so incidents do not require five tools.",size:1200,open:44.1,click:13.6,unsub:.4,subject:"Five dashboards, one incident",preview:"Your stack got AI. Your visibility didn't.",body:"Every new AI feature adds another moving part. See how a unified view can shorten investigations across applications, infrastructure, and AI workloads.\n\n→ Book a platform assessment"},
+      {name:"SRE / On-call",role:"Technical end user · Incidents",angle:"Faster root cause, fewer tabs, fewer surprises during AI incidents.",size:2400,open:39.8,click:16.9,unsub:.7,subject:"Shorter path from alert to root cause",preview:"Fewer tabs. Faster root cause.",body:"On-call is already hard enough. When AI workloads fail, context across logs, telemetry, and model behavior can reduce the time to understand an incident.\n\n→ Try an incident walkthrough"},
+      {name:"Security Leader",role:"Technical evaluator · Risk",angle:"See new AI attack surfaces and security signals alongside the systems that run the model.",size:800,open:47.3,click:12.1,unsub:.3,subject:"Your AI attack surface is in engineering's tools",preview:"Respond with full context.",body:"Prompt injection and sensitive data exposure create new risks. Here's how teams can bring AI security signals closer to existing monitoring workflows.\n\n→ Read the security guide"},
+      {name:"Finance Buyer",role:"Economic buyer · AI cost",angle:"Predict GPU and cloud expenses and understand the budget impact of tool sprawl.",size:450,open:41,click:9.2,unsub:.5,subject:"GPU spend is the line item nobody forecast",preview:"See AI cost before it scales.",body:"AI compute costs are growing and tool sprawl adds up. See how consolidated visibility could make cloud and AI spending easier to forecast.\n\n→ Request the ROI worksheet"}
+    ],
+    topics:["A practical runbook for AI-in-production incidents","The cost of observability tool sprawl","Forecasting GPU spend before it scales"],
+    tests:["A: Your AI incident runbook starts here","B: Find the root cause without switching tools"],
+    rationale:"Under these assumptions, the on-call audience clicks most often. I would test a practical incident-response guide before broad executive-level messaging."
+  }
+};
+const $=id=>document.getElementById(id);
+let company="zip",persona=0,tab="audience",running=false;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pct=n=>Number(n).toFixed(Number(n)%1?1:0)+"%";
+function sum(d){return d.personas.reduce((n,p)=>n+p.size,0).toLocaleString();}
+function top(d){return d.personas.reduce((a,b)=>a.click>b.click?a:b);}
+function selector(d){return '<div class="personas">'+d.personas.map((p,i)=>'<button type="button" class="persona '+(i===persona?'active':'')+'" data-persona="'+i+'" aria-pressed="'+(i===persona)+'"><strong>'+esc(p.name)+'</strong><small>'+esc(p.role)+'</small></button>').join('')+'</div>';}
+function updateCompany(){
+  const d=DATA[company];$("context").textContent=d.context;$("logic").textContent=d.logic;$("topic").textContent=d.topic;$("output-company").textContent=" / "+d.name;
+  document.querySelectorAll("[data-company]").forEach(b=>{const on=b.dataset.company===company;b.classList.toggle("selected",on);b.setAttribute("aria-pressed",String(on));});
+  persona=0;render();
+}
+function render(){
+  const d=DATA[company],p=d.personas[persona],left=selector(d);
+  let inner="";
+  if(tab==="audience"){
+    inner='<div class="content-grid">'+left+'<div class="card"><div class="tiny-heading">Strategic decision</div><h3>Different buyers need different reasons to care.</h3><p class="muted">'+esc(d.logic)+'</p><div class="field-label">Selected audience</div><h3>'+esc(p.name)+'</h3><span class="pill">'+esc(p.role)+'</span><p class="quote">'+esc(p.angle)+'</p><div class="field-label">Example campaign subject line</div><p><strong>'+esc(p.subject)+'</strong></p><div class="mini">This audience and message are defined in the example company profile before execution.</div></div></div>';
+  } else if(tab==="content"){
+    inner='<div class="content-grid">'+left+'<div><div class="card" style="margin-bottom:14px"><div class="tiny-heading">Blog draft · excerpt</div><h3>'+esc(d.topic)+'</h3><p>'+esc(d.blog)+'</p></div><div class="card"><div class="tiny-heading">Segmented newsletter · '+esc(p.name)+'</div><h3>'+esc(p.subject)+'</h3><p class="muted">'+esc(p.preview)+'</p><div class="newsletter">Hi Alex,\n\n'+esc(p.body)+'</div><p class="mini" style="margin:12px 0 0">Sample copy from the profile. Change the persona at left to compare the angle and CTA.</p></div></div></div>';
+  } else if(tab==="metrics"){
+    const t=top(d);
+    inner='<div class="notice"><strong>Illustrative only.</strong> Audience sizes and engagement rates are sample assumptions from the repository profiles. No emails were sent, and these are not actual campaign outcomes.</div><div class="metric-grid"><div class="metric-card"><div class="metric-caption">Modeled audience</div><div class="metric-num">'+sum(d)+'</div></div><div class="metric-card"><div class="metric-caption">Segments</div><div class="metric-num">'+d.personas.length+'</div></div><div class="metric-card"><div class="metric-caption">Highest modeled click rate</div><div class="metric-num">'+pct(t.click)+'</div><div class="metric-caption">'+esc(t.name)+'</div></div></div><div class="card"><div class="tiny-heading">Modeled click rate by audience</div>'+d.personas.map(p=>'<div class="chart-row"><span>'+esc(p.name)+'</span><div class="track"><div class="fill" style="width:'+Math.min(100,p.click*4)+'%"></div></div><strong>'+pct(p.click)+'</strong></div>').join('')+'<p class="mini">Open rates: '+d.personas.map(p=>esc(p.name)+' '+pct(p.open)).join(' · ')+'</p></div>';
+  } else {
+    inner='<div class="notice">This is an example of PMM reasoning from simulated performance, not an AI prediction of real customer behavior.</div><div class="recommendations"><div class="rec"><strong>Insight → hypothesis</strong><h3>What the signal suggests</h3><p>'+esc(d.rationale)+'</p><p><strong>Strongest modeled segment:</strong> '+esc(top(d).name)+' ('+pct(top(d).click)+' click rate)</p></div><div class="rec"><strong>Next content bets</strong><h3>What I would publish next</h3><ul>'+d.topics.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div><div class="rec"><strong>Experiment design</strong><h3>Headline test</h3><ul>'+d.tests.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div><div class="rec"><strong>Measurement plan</strong><h3>How I would learn</h3><p>Compare click-through and downstream conversion by audience. Use a consistent send window and track outcomes before drawing conclusions. Prioritize qualified engagement, not opens alone.</p></div></div>';
+  }
+  $("tab-content").innerHTML=inner;
+  document.querySelectorAll("[data-persona]").forEach(b=>b.addEventListener("click",()=>{persona=Number(b.dataset.persona);render();}));
+  document.querySelectorAll("[data-tab]").forEach(b=>{const on=b.dataset.tab===tab;b.classList.toggle("active",on);b.setAttribute("aria-selected",String(on));});
+}
+document.querySelectorAll("[data-company]").forEach(b=>b.addEventListener("click",()=>{if(running)return;company=b.dataset.company;updateCompany();$("run-status").textContent="Example switched to "+DATA[company].name+". Click Run sample workflow or explore the prepared results.";document.querySelectorAll(".flow-step").forEach(n=>n.classList.remove("done","current"));}));
+document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{tab=b.dataset.tab;render();}));
+$("run").addEventListener("click",async()=>{
+  if(running)return;running=true;$("run").disabled=true;
+  const steps=Array.from(document.querySelectorAll(".flow-step"));steps.forEach(el=>el.classList.remove("done","current"));
+  for(let i=0;i<steps.length;i++){
+    steps[i].classList.add("current");$("run-status").textContent="Replaying sample step "+(i+1)+" of 4…";
+    await new Promise(resolve=>setTimeout(resolve,240));
+    steps[i].classList.remove("current");steps[i].classList.add("done");
+  }
+  tab="audience";persona=0;render();$("run-status").textContent="Sample replay completed. Explore the four output tabs below.";running=false;$("run").disabled=false;
+  $("results").scrollIntoView({behavior:"smooth",block:"start"});
+});
+$("copy").addEventListener("click",async()=>{
+  const d=DATA[company],s="AI PMM Workflow — "+d.name+"\nAudience strategy: "+d.logic+"\nCampaign topic: "+d.topic+"\nSegments: "+d.personas.map(p=>p.name).join(", ")+"\nModeled audience: "+sum(d)+"; strongest illustrative click rate: "+top(d).name+" ("+pct(top(d).click)+").\nPMM next step: "+d.rationale+"\nNote: Prepared sample; metrics simulated; no email sent.";
+  try{await navigator.clipboard.writeText(s);$("copy").textContent="✓ Copied";setTimeout(()=>$("copy").textContent="Copy interview summary",1800);}catch(err){$("copy").textContent="Copy unavailable";setTimeout(()=>$("copy").textContent="Copy interview summary",2000);}
+});
+updateCompany();
+})();
+</script>
+</body>
+</html>
