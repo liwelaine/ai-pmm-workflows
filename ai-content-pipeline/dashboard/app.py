@@ -87,9 +87,12 @@ def index():
 
 @app.get("/prototype")
 def prototype():
-    """Serve the static, clearly labeled interview preview from the same local app."""
-    from flask import send_file
-    return send_file(Path(__file__).resolve().parents[2] / "docs" / "demo.html")
+    """Render the prepared sample demo alongside the local live dashboard."""
+    from flask import Response
+    page = (Path(__file__).resolve().parents[2] / "docs" / "demo.html").read_text()
+    page = page.replace('href="./index.html"', 'href="/"')
+    page = page.replace('</nav>', '<div style="text-align:center;padding:12px;background:#e8f7f3"><a style="font-weight:750" href="/performance">↗ See actual HubSpot email performance (read-only)</a></div></nav>', 1)
+    return Response(page, mimetype="text/html", headers={"Cache-Control": "no-store"})
 
 
 @app.route("/workspace/billables-ai")
